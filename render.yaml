@@ -1,0 +1,55 @@
+services:
+  # ── Django API backend ────────────────────────────────────────────────────
+  - type: web
+    name: nexus-chat-api
+    runtime: python
+    plan: free
+    buildCommand: >-
+      pip install -r backend/requirements.txt &&
+      cd backend &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+    startCommand: cd backend && gunicorn chatapi.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: chatapi.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: GROQ_API_KEY
+        sync: false          # set manually in Render dashboard
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nexus-chat-db
+          property: connectionString
+
+  # ── React frontend static site ────────────────────────────────────────────
+  - type: web
+    name: nexus-chat-frontend
+    runtime: static
+    plan: free
+    buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @workspace/chat-frontend run build
+    staticPublishPath: ./artifacts/chat-frontend/dist/public
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: BASE_PATH
+        value: /
+      # After deploying the backend, set this to your actual backend URL:
+      # e.g. https://nexus-chat-api.onrender.com
+      - key: VITE_API_URL
+        value: https://nexus-chat-api.onrender.com
+
+# ── Free PostgreSQL database ──────────────────────────────────────────────
+databases:
+  - name: nexus-chat-db
+    plan: free
