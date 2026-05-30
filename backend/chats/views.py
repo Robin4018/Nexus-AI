@@ -95,6 +95,33 @@ def send_message(request, pk):
 
     # Save AI response and update conversation timestamp
     assistant_msg = Message.objects.create(conversation=convo, role='assistant', content=ai_content)
+
+    # Auto-title: generate a short title from the first user message
+    is_first_message = Message.objects.filter(conversation=convo).count() == 2  # user + assistant just saved
+    default_titles = {'New Chat', 'New Conversation'}
+    if is_first_message and convo.title in default_titles:
+        try:
+            title_completion = client.chat.completions.create(
+                model=settings.AI_MODEL,
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': (
+                            'Generate a short, descriptive title (3–6 words) for a chat conversation '
+                            'based on the user\'s first message. Reply with only the title — no quotes, '
+                            'no punctuation at the end, no explanation.'
+                        ),
+                    },
+                    {'role': 'user', 'content': content},
+                ],
+                max_tokens=20,
+            )
+            new_title = title_completion.choices[0].message.content.strip().strip('"\'')
+            if new_title:
+                convo.title = new_title
+        except Exception:
+            pass  # silently keep the existing title on failure
+
     convo.save()  # triggers auto_now on updated_at
 
     return Response({
