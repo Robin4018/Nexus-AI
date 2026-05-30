@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
+const API_ORIGIN = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function Chat() {
@@ -71,7 +72,7 @@ export default function Chat() {
     setStreamingContent("");
 
     try {
-      const response = await fetch(`${BASE}/api/conversations/${convId}/stream`, {
+      const response = await fetch(`${API_ORIGIN}${BASE}/api/conversations/${convId}/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
