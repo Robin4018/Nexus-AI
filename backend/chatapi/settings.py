@@ -4,7 +4,11 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SESSION_SECRET', 'django-insecure-change-me-in-production-x5k2j9m')
+SECRET_KEY = (
+    os.environ.get('SECRET_KEY') or
+    os.environ.get('SESSION_SECRET') or
+    'django-insecure-change-me-in-production-x5k2j9m'
+)
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
