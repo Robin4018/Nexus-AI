@@ -2,7 +2,7 @@ import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import Login from "@/pages/login";
@@ -11,7 +11,10 @@ import Chat from "@/pages/chat";
 
 const queryClient = new QueryClient();
 
-// Setup JWT injection
+// Point all API calls at the backend (cross-origin in production, relative in dev)
+if (import.meta.env.VITE_API_URL) {
+  setBaseUrl(import.meta.env.VITE_API_URL as string);
+}
 setAuthTokenGetter(() => localStorage.getItem("access_token"));
 
 function ProtectedRoute({ component: Component, ...rest }: { component: any, path: string }) {
