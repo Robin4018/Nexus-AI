@@ -1,5 +1,5 @@
 kind = "api"
-previewPath = "/api" # TODO - should be excluded from preview in the first place
+previewPath = "/api"
 title = "API Server"
 version = "1.0.0"
 id = "3B4_FFSkEVBkAeYMFRJ2e"
@@ -10,15 +10,15 @@ name = "API Server"
 paths = ["/api"]
 
 [services.development]
-run = "cd backend && python manage.py runserver 0.0.0.0:$PORT"
+run = "PYTHONPATH=/home/runner/workspace/backend DJANGO_SETTINGS_MODULE=chatapi.settings python /home/runner/workspace/backend/manage.py runserver 0.0.0.0:$PORT"
 
 [services.production]
 
 [services.production.build]
-args = ["sh", "-c", "cd backend && python manage.py collectstatic --noinput"]
+args = ["sh", "-c", "cd /home/runner/workspace/backend && python manage.py collectstatic --noinput"]
 
 [services.production.run]
-args = ["sh", "-c", "cd backend && gunicorn chatapi.wsgi:application --bind 0.0.0.0:$PORT --workers 2"]
+args = ["sh", "-c", "cd /home/runner/workspace/backend && gunicorn chatapi.wsgi:application --bind 0.0.0.0:$PORT --workers 2"]
 
 [services.production.run.env]
 PORT = "8080"

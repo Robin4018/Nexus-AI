@@ -1,26 +1,41 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { setAuthTokenGetter } from "@workspace/api-client-react";
 import NotFound from "@/pages/not-found";
+import { useEffect } from "react";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import Chat from "@/pages/chat";
 
 const queryClient = new QueryClient();
 
-function Home() {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Replit Agent is building...</h1>
-        <p className="mt-2 text-sm text-gray-600">Your app will appear here once it's ready.</p>
-      </div>
-    </div>
-  );
+// Setup JWT injection
+setAuthTokenGetter(() => localStorage.getItem("access_token"));
+
+function ProtectedRoute({ component: Component, ...rest }: { component: any, path: string }) {
+  const [location, setLocation] = useLocation();
+  const token = localStorage.getItem("access_token");
+
+  useEffect(() => {
+    if (!token) {
+      setLocation("/login");
+    }
+  }, [token, setLocation]);
+
+  if (!token) return null;
+
+  return <Route {...rest} component={Component} />;
 }
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <ProtectedRoute path="/" component={Chat} />
+      <ProtectedRoute path="/chat/:id" component={Chat} />
       <Route component={NotFound} />
     </Switch>
   );
