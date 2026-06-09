@@ -27,7 +27,7 @@ services:
   - type: web
     name: nexus-chat-frontend
     runtime: static
-    buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @workspace/chat-frontend run build
+    buildCommand: npx pnpm install && npx pnpm --filter @workspace/chat-frontend run build
     staticPublishPath: ./artifacts/chat-frontend/dist/public
     headers:
       - path: /*
