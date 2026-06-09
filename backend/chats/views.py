@@ -14,7 +14,7 @@ from .serializers import ConversationSerializer, ConversationDetailSerializer, M
 
 
 def get_ai_client():
-    api_key = settings.GROQ_API_KEY
+    api_key = settings.OPENAI_API_KEY
     if not api_key:
         return None
     return OpenAI(
