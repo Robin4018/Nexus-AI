@@ -72,7 +72,7 @@ def send_message(request, pk):
     client = get_ai_client()
     if not client:
         return Response(
-            {'error': 'AI service not configured. Please set the GROQ_API_KEY secret.'},
+            {'error': 'AI service not configured. Please set the OPENAI_API_KEY secret.'},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
