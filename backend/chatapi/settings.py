@@ -123,6 +123,6 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
-AI_MODEL = 'llama-3.3-70b-versatile'
-AI_BASE_URL = 'https://api.groq.com/openai/v1'
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+AI_MODEL = 'gpt-4o-mini'
+AI_BASE_URL = 'https://api.openai.com/v1'
