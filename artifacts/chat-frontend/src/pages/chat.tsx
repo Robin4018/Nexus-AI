@@ -50,6 +50,7 @@ export default function Chat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
+  const [streamError, setStreamError] = useState<string | null>(null);
 
   const { data: user } = useGetMe();
   const { data: conversations = [] } = useListConversations();
@@ -70,6 +71,7 @@ export default function Chat() {
   const streamMessage = useCallback(async (convId: number, content: string) => {
     setIsStreaming(true);
     setStreamingContent("");
+    setStreamError(null);
 
     try {
       const response = await fetch(`${API_ORIGIN}${BASE}/api/conversations/${convId}/stream`, {
@@ -108,13 +110,13 @@ export default function Chat() {
               await queryClient.invalidateQueries({ queryKey: getGetConversationQueryKey(convId) });
               await queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() });
             } else if (data.type === "error") {
-              console.error("Stream error:", data.error);
+              setStreamError(data.error ?? "Something went wrong. Please try again.");
             }
           } catch {}
         }
       }
     } catch (err) {
-      console.error("Streaming failed:", err);
+      setStreamError("Could not reach the AI. Please try again.");
     } finally {
       setIsStreaming(false);
       setStreamingContent(null);
@@ -411,6 +413,20 @@ export default function Chat() {
                             <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                           </div>
                         )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!isStreaming && streamError && (
+                  <div className="flex w-full justify-start">
+                    <div className="flex gap-4 max-w-[85%] px-2 py-2">
+                      <Avatar className="h-8 w-8 mt-1 flex-shrink-0 border border-destructive/30">
+                        <AvatarFallback className="bg-destructive/10 text-destructive">
+                          <TerminalSquare size={16} />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-destructive/80 pt-1 text-sm leading-relaxed">
+                        {streamError}
                       </div>
                     </div>
                   </div>
