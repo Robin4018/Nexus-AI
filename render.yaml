@@ -3,7 +3,6 @@ services:
   - type: web
     name: nexus-chat-api
     runtime: python
-    plan: free
     buildCommand: >-
       pip install -r backend/requirements.txt &&
       cd backend &&
@@ -28,7 +27,6 @@ services:
   - type: web
     name: nexus-chat-frontend
     runtime: static
-    plan: free
     buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @workspace/chat-frontend run build
     staticPublishPath: ./artifacts/chat-frontend/dist/public
     headers:
